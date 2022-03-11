@@ -26,4 +26,14 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_share_xml" />
 
+    <Button
+        android:id="@+id/btn_generate_xml"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Generate XML"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_share_pdf" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

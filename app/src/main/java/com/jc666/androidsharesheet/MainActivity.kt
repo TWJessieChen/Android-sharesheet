@@ -14,6 +14,16 @@ import java.io.File
 import java.security.AccessController.getContext
 import android.content.pm.ResolveInfo
 import android.util.Log
+import android.provider.Telephony.Sms
+
+import android.util.Xml
+
+import org.xmlpull.v1.XmlSerializer
+
+import android.os.Environment
+import java.io.FileOutputStream
+import java.io.IOException
+import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
@@ -23,12 +33,15 @@ class MainActivity : AppCompatActivity() {
 
     private var btn_share_pdf: Button? = null
 
+    private var btn_generate_xml: Button? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         btn_share_xml = findViewById(R.id.btn_share_xml)
         btn_share_pdf = findViewById(R.id.btn_share_pdf)
+        btn_generate_xml = findViewById(R.id.btn_generate_xml)
 
         //搬移assets底下的檔案到data/data底下
         copyFile("Coroutine.pdf")
@@ -42,6 +55,99 @@ class MainActivity : AppCompatActivity() {
             sharePDF()
         }
 
+        btn_generate_xml!!.setOnClickListener {
+            var filePath = applicationContext.getFilesDir().getAbsolutePath() + File.separator;
+            var fileName = System.currentTimeMillis().toString() + " BriteMED.xml";
+            GenerateBriteMedXMLMethod.generateBriteMEDXMLFile(filePath, fileName)
+        }
+
+    }
+
+    fun changeLine(serializer: XmlSerializer, enter: String?) {
+        try {
+            serializer.text(enter)
+        } catch (e: IOException) {
+            Log.d(TAG, "IOException: " + e.toString())
+        }
+    }
+
+    fun generateBriteMEDXmlSerializer(file: File) {
+        try {
+            val enter = System.getProperty("line.separator") //换行
+            val fos = FileOutputStream(file)
+            //create XmlSerializer class
+            val xs = Xml.newSerializer()
+            xs.setOutput(fos, "utf-8")
+            //產生xml的標頭
+            xs.startDocument("utf-8", true)
+            changeLine(xs, enter)
+            //開始新增xml節點
+            xs.startTag(null, "AnnotatedECG")
+            xs.attribute(null,"xmlns", "urn:hl7-org:v3")
+            xs.attribute(null,"xmlns", "urn:hl7-org:v3/voc")
+            xs.attribute(null,"xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
+            xs.attribute(null,"xsi:schemaLocation", "urn:hl7-org:v3 ../schema/PORT_MT020001.xsd")
+            xs.attribute(null,"type", "Observation")
+            changeLine(xs, enter)
+
+            for (dataIndex in 0 until 1) {
+                xs.startTag(null, "sms")
+                xs.startTag(null, "body")
+                xs.text("JC")
+                xs.endTag(null, "body")
+                xs.startTag(null, "date")
+                xs.text("JC")
+                xs.endTag(null, "date")
+                xs.startTag(null, "address")
+                xs.text("JC")
+                xs.endTag(null, "address")
+                xs.startTag(null, "type")
+                xs.text("JC")
+                xs.endTag(null, "type")
+                xs.endTag(null, "sms")
+            }
+            xs.endTag(null, "AnnotatedECG")
+            //生成xml头
+            xs.endDocument()
+        } catch (e: Exception) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+        }
+    }
+
+    fun generateXmlSerializer(file: File) {
+        try {
+            val fos = FileOutputStream(file)
+            // 获取xml序列化器
+            val xs = Xml.newSerializer()
+            xs.setOutput(fos, "utf-8")
+            //生成xml头
+            xs.startDocument("utf-8", true)
+            //添加xml根节点
+            xs.startTag(null, "message")
+            for (dataIndex in 0 until 1) {
+                xs.startTag(null, "sms")
+                xs.startTag(null, "body")
+                xs.text("JC")
+                xs.endTag(null, "body")
+                xs.startTag(null, "date")
+                xs.text("JC")
+                xs.endTag(null, "date")
+                xs.startTag(null, "address")
+                xs.text("JC")
+                xs.endTag(null, "address")
+                xs.startTag(null, "type")
+                xs.text("JC")
+                xs.endTag(null, "type")
+                xs.endTag(null, "sms")
+            }
+            xs.endTag(null, "message")
+            //生成xml头
+            xs.endDocument()
+        } catch (e: Exception) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+        }
     }
 
     fun Context.copyFile(filename: String) {
@@ -231,3 +337,31 @@ class MainActivity : AppCompatActivity() {
 
 
 }
+
+//            val fos = FileOutputStream(file)
+//            var sb: StringBuffer = StringBuffer()
+//            // 添加xml头
+//            sb.append("<?xml version='1.0' encoding='utf-8'?> \n")
+//            // 添加根节点
+//            sb.append("<message>")
+//            // 每一条短信添加一个sms节点
+//            for (dataIndex in 0 until 2) {
+//                sb.append("<sms>")
+//                sb.append("<body>")
+//                sb.append("JC666")
+//                sb.append("</body>")
+//                sb.append("<date>")
+//                sb.append("JC666")
+//                sb.append("</date>")
+//                sb.append("<address>")
+//                sb.append("JC666")
+//                sb.append("</address>")
+//                sb.append("<type>")
+//                sb.append("JC666")
+//                sb.append("</type>")
+//                sb.append("</sms>")
+//            }
+//            sb.append("</message>")
+//            fos.write(sb.toString().toByteArray())
+//            fos.close()
+//            Log.d(TAG, "Generate XML.")
